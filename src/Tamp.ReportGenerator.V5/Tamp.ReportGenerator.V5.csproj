@@ -8,7 +8,6 @@
 
   <PropertyGroup Label="Package">
     <PackageId>Tamp.ReportGenerator.V5</PackageId>
-    <Version>0.0.1-alpha</Version>
     <Description>Tamp wrapper for ReportGenerator 5.x — converts coverage reports (Cobertura, OpenCover, lcov, etc.) into HTML / Markdown / Badges / SonarQube format.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
