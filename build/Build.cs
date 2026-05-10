@@ -63,6 +63,8 @@ class Build : TampBuild
             .SetConfiguration(Configuration)
             .SetNoBuild(true)
             .AddLogger("trx;LogFileName=test-results.trx")
+            .AddDataCollector("XPlat Code Coverage")
+            .SetSettings((RootDirectory / "build" / "coverlet.runsettings").Value)
             .SetResultsDirectory(Artifacts / "test-results")));
 
     Target Pack => _ => _
@@ -120,6 +122,10 @@ class Build : TampBuild
             s.SetHostUrl(SonarHostUrl);
             s.SetToken(SonarToken!);
             s.SetProperty("sonar.cs.vstest.reportsPaths", $"{(Artifacts / "test-results").Value}/**/*.trx");
+            s.SetProperty("sonar.cs.opencover.reportsPaths", $"{(Artifacts / "test-results").Value}/**/coverage.opencover.xml");
+
+            s.SetProperty("sonar.coverage.exclusions", "tests/**,build/**,samples/**");
+
             s.SetProperty("sonar.exclusions", "**/bin/**,**/obj/**,artifacts/**,build/**,docs/**,samples/**");
         }));
 
