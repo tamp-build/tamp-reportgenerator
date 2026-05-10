@@ -4,17 +4,36 @@ ReportGenerator wrapper for [Tamp](https://github.com/tamp-build/tamp).
 
 | Package | ReportGenerator | Status |
 |---|---|---|
-| [`Tamp.ReportGenerator.V5`](src/Tamp.ReportGenerator.V5) | 5.x | live |
+| [`Tamp.ReportGenerator.V5`](src/Tamp.ReportGenerator.V5) | 5.x | preview |
 
 Converts coverage reports (Cobertura, OpenCover, lcov, etc.) into HTML,
 Markdown, Badges, SonarQube, and 30+ other formats.
+
+License keys (Pro tier) are typed as `Secret` and registered with the
+runner's redaction table.
+
+Requires `Tamp.Core ≥ 1.0.0`.
 
 ## Why a separate repo
 
 ReportGenerator is a third-party tool by Daniel Palme with its own
 release cadence (5.x has been out for years; minor versions every couple
-months). Per the Tamp satellite-repo convention, third-party tools live
+months). Per the satellite-repo convention, third-party tools live
 outside main.
+
+## Install
+
+In your build script's `Directory.Packages.props`:
+
+```xml
+<PackageVersion Include="Tamp.ReportGenerator.V5" Version="0.0.1-alpha" />
+```
+
+In `build/Build.csproj`:
+
+```xml
+<PackageReference Include="Tamp.ReportGenerator.V5" />
+```
 
 ## Quick example — pair with Tamp.DotNetCoverage
 
@@ -59,6 +78,12 @@ class Build : TampBuild
             .SetTag(Git.Commit[..7])));
 }
 ```
+
+## See also
+
+- [tamp](https://github.com/tamp-build/tamp) — the core framework
+- [tamp-build/tamp main's `Tamp.DotNetCoverage.V18`](https://github.com/tamp-build/tamp) — the coverage producer this consumes
+- [ReportGenerator docs](https://reportgenerator.io/) — output formats, filter grammar
 
 ## License
 
