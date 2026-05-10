@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+    <RootNamespace>Tamp.ReportGenerator.V5</RootNamespace>
+    <AssemblyName>Tamp.ReportGenerator.V5</AssemblyName>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Package">
+    <PackageId>Tamp.ReportGenerator.V5</PackageId>
+    <Version>0.0.1-alpha</Version>
+    <Description>Tamp wrapper for ReportGenerator 5.x — converts coverage reports (Cobertura, OpenCover, lcov, etc.) into HTML / Markdown / Badges / SonarQube format.</Description>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="$(TampCorePath)" Condition="'$(TampCoreMode)' == 'project'" />
+    <PackageReference Include="Tamp.Core" Condition="'$(TampCoreMode)' == 'package'" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
+  </ItemGroup>
+
+</Project>
