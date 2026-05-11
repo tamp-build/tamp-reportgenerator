@@ -29,7 +29,37 @@ public static class ReportGenerator
         if (configure is null) throw new ArgumentNullException(nameof(configure));
         var s = new ReportGeneratorSettings();
         configure(s);
+        return Plan(tool, s);
+    }
 
+    // ---- Object-init overloads (0.2.0+, TAM-161) ----
+    // Two equivalent authoring styles; both produce identical CommandPlans. Fluent
+    // stays canonical in docs and `tamp init` templates; object-init available for
+    // consumers who prefer the C# initializer shape.
+    //
+    //     ReportGenerator.Run(RgTool, new()
+    //     {
+    //         Reports = { "coverage.cobertura.xml" },
+    //         TargetDir = "artifacts/coverage-report",
+    //         ReportTypes = { ReportGeneratorReportType.Html },
+    //     });
+    //
+    // is equivalent to:
+    //
+    //     ReportGenerator.Run(RgTool, s => s
+    //         .AddReport("coverage.cobertura.xml")
+    //         .SetTargetDir("artifacts/coverage-report")
+    //         .AddReportType(ReportGeneratorReportType.Html));
+
+    public static CommandPlan Run(Tool tool, ReportGeneratorSettings settings)
+    {
+        if (tool is null) throw new ArgumentNullException(nameof(tool));
+        if (settings is null) throw new ArgumentNullException(nameof(settings));
+        return Plan(tool, settings);
+    }
+
+    private static CommandPlan Plan(Tool tool, ReportGeneratorSettings s)
+    {
         if (s.Reports.Count == 0)
             throw new InvalidOperationException("ReportGenerator: at least one report is required (set via AddReport / AddReports).");
         if (string.IsNullOrEmpty(s.TargetDir))

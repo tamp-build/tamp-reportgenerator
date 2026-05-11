@@ -39,10 +39,17 @@ class Build : TampBuild
     });
 
     Target Clean => _ => _
-        .TopLevel()
         .Executes(() =>
         {
-            foreach (var d in RootDirectory.GlobDirectories("**/bin", "**/obj")) d.Delete();
+            // Exclude the build script's own bin/obj — we're currently running from there.
+            // Deleting them mid-run would self-evict the Tamp.NetCli.V10 dll the Restore
+            // target needs. The Tamp.Core 1.0.8 GlobDirectories fix surfaced this trap.
+            var buildDir = (RootDirectory / "build").Value;
+            foreach (var d in RootDirectory.GlobDirectories("**/bin", "**/obj"))
+            {
+                if (d.Value.StartsWith(buildDir, StringComparison.Ordinal)) continue;
+                d.Delete();
+            }
             Artifacts.Delete();
         });
 
@@ -50,7 +57,6 @@ class Build : TampBuild
         .Executes(() => DotNet.Restore(s => s.SetProject(Solution.Path)));
 
     Target Compile => _ => _
-        .TopLevel()
         .DependsOn(nameof(Restore))
         .Executes(() => DotNet.Build(s => s
             .SetProject(Solution.Path)
@@ -58,7 +64,6 @@ class Build : TampBuild
             .SetNoRestore(true)));
 
     Target Test => _ => _
-        .TopLevel()
         .DependsOn(nameof(Compile))
         .Description("Unit tests only — integration tests need reportgenerator on PATH and are run separately.")
         .Executes(() => DotNet.Test(s => s
@@ -71,7 +76,6 @@ class Build : TampBuild
             .SetResultsDirectory(Artifacts / "test-results")));
 
     Target Pack => _ => _
-        .TopLevel()
         .DependsOn(nameof(Test))
         .Executes(() => DotNet.Pack(s =>
         {
@@ -83,7 +87,6 @@ class Build : TampBuild
         }));
 
     Target Push => _ => _
-        .TopLevel()
         .DependsOn(nameof(Pack))
         .Requires(() => NuGetApiKey != null)
         .Executes(() => Artifacts.GlobFiles("*.nupkg")
@@ -94,7 +97,6 @@ class Build : TampBuild
                 .SetSkipDuplicate(true))));
 
     Target Ci => _ => _
-        .TopLevel()
         .DependsOn(nameof(Info), nameof(Clean), nameof(Pack));
 
     Target Default => _ => _.DependsOn(nameof(Compile));
@@ -140,7 +142,6 @@ class Build : TampBuild
         .Executes(() => Tamp.SonarScanner.V10.SonarScanner.End(SonarTool, s => s.SetToken(SonarToken)));
 
     Target Sonar => _ => _
-        .TopLevel()
         .DependsOn(nameof(SonarBegin), nameof(SonarEnd))
         .Description("End-to-end Sonar scan: Begin (before Compile) → Compile → Test → End. Requires SONAR_TOKEN.");
 

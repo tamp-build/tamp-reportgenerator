@@ -21,7 +21,7 @@ public sealed class ReportGeneratorTests
 
     [Fact]
     public void Run_Throws_On_Null_Configurer()
-        => Assert.Throws<ArgumentNullException>(() => ReportGenerator.Run(FakeTool(), null!));
+        => Assert.Throws<ArgumentNullException>(() => ReportGenerator.Run(FakeTool(), (Action<ReportGeneratorSettings>)null!));
 
     [Fact]
     public void Run_Throws_When_No_Reports_Specified()
