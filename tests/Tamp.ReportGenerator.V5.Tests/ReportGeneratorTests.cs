@@ -36,8 +36,11 @@ public sealed class ReportGeneratorTests
     [Fact]
     public void Run_Executable_Is_The_Tool_Path()
     {
-        var plan = ReportGenerator.Run(FakeTool(), s => s.AddReport("a.xml").SetTargetDir("/out"));
-        Assert.Equal("/fake/reportgenerator", plan.Executable);
+        // AbsolutePath normalizes per-OS (drive letter on Windows); compare against
+        // the post-normalization value rather than the hardcoded POSIX shape.
+        var tool = FakeTool();
+        var plan = ReportGenerator.Run(tool, s => s.AddReport("a.xml").SetTargetDir("/out"));
+        Assert.Equal(tool.Executable.Value, plan.Executable);
     }
 
     [Fact]
