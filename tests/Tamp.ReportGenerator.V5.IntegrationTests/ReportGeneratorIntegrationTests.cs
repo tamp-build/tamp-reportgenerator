@@ -61,14 +61,26 @@ public sealed class ReportGeneratorIntegrationTests : IDisposable
 
     private static Tool ResolveTool()
     {
-        var home = Environment.GetEnvironmentVariable("HOME") ?? "";
-        foreach (var candidate in new[] { "reportgenerator", "reportgenerator.exe" })
+        // Walk PATH first (covers `dotnet tool install -g` adding ~/.dotnet/tools to PATH on every OS).
+        var pathVar = Environment.GetEnvironmentVariable("PATH") ?? "";
+        var separator = OperatingSystem.IsWindows() ? ';' : ':';
+        var executable = OperatingSystem.IsWindows() ? "reportgenerator.exe" : "reportgenerator";
+        foreach (var dir in pathVar.Split(separator, StringSplitOptions.RemoveEmptyEntries))
         {
-            var p = Path.Combine(home, ".dotnet", "tools", candidate);
+            var candidate = Path.Combine(dir, executable);
+            if (File.Exists(candidate)) return new Tool(AbsolutePath.Create(candidate));
+        }
+        // Fall back to ~/.dotnet/tools (HOME on POSIX, USERPROFILE on Windows).
+        var home = Environment.GetEnvironmentVariable("HOME")
+            ?? Environment.GetEnvironmentVariable("USERPROFILE")
+            ?? "";
+        if (!string.IsNullOrEmpty(home))
+        {
+            var p = Path.Combine(home, ".dotnet", "tools", executable);
             if (File.Exists(p)) return new Tool(AbsolutePath.Create(p));
         }
         throw new InvalidOperationException(
-            "reportgenerator not found in ~/.dotnet/tools. Install with: dotnet tool install -g dotnet-reportgenerator-globaltool --version 5.*");
+            "reportgenerator not found on PATH or in ~/.dotnet/tools. Install with: dotnet tool install -g dotnet-reportgenerator-globaltool --version 5.*");
     }
 
     private CaptureResult Run(CommandPlan plan)

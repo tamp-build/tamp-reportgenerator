@@ -66,13 +66,12 @@ public sealed class ReportGeneratorTests
     [Fact]
     public void Reports_AddReports_From_AbsolutePath_Sequence_Round_Trips()
     {
-        var paths = new[]
-        {
-            AbsolutePath.Create("/abs/a.xml"),
-            AbsolutePath.Create("/abs/b.xml"),
-        };
-        var args = ReportGenerator.Run(FakeTool(), s => s.AddReports(paths).SetTargetDir("/out")).Arguments;
-        Assert.Equal("/abs/a.xml;/abs/b.xml", FlagValue(args, "reports"));
+        // AbsolutePath normalizes per-OS (drive letter on Windows), so compare against
+        // post-normalization values rather than the hardcoded POSIX shape.
+        var a = AbsolutePath.Create("/abs/a.xml");
+        var b = AbsolutePath.Create("/abs/b.xml");
+        var args = ReportGenerator.Run(FakeTool(), s => s.AddReports(new[] { a, b }).SetTargetDir("/out")).Arguments;
+        Assert.Equal($"{a.Value};{b.Value}", FlagValue(args, "reports"));
     }
 
     [Fact]
