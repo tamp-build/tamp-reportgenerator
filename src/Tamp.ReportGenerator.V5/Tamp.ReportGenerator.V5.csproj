@@ -10,7 +10,12 @@
     <PackageId>Tamp.ReportGenerator.V5</PackageId>
     <Description>Tamp wrapper for ReportGenerator 5.x — converts coverage reports (Cobertura, OpenCover, lcov, etc.) into HTML / Markdown / Badges / SonarQube format.</Description>
     <IsPackable>true</IsPackable>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="$(TampCorePath)" Condition="'$(TampCoreMode)' == 'project'" />
