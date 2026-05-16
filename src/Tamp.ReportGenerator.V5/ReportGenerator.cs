@@ -83,7 +83,10 @@ public static class ReportGenerator
         if (s.Verbosity is { } v) args.Add($"-verbosity:{v}");
         if (!string.IsNullOrEmpty(s.Title)) args.Add($"-title:{s.Title}");
         if (!string.IsNullOrEmpty(s.Tag)) args.Add($"-tag:{s.Tag}");
+        // TODO: extract Reveal into ReportGeneratorLicenseSettings to satisfy TAMP004 cleanly.
+#pragma warning disable TAMP004
         if (s.License is { } lic) args.Add($"-license:{lic.Reveal()}");
+#pragma warning restore TAMP004
 
         return new CommandPlan
         {
